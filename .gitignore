@@ -1,0 +1,6 @@
+# C object files
+*.o
+
+# Ctags files
+tags
+
