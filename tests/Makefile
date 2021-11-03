@@ -7,12 +7,12 @@
 # 2021, d3phys
 #
 
-OBJS = list.o
+OBJS = test.o
 
-ds.o: $(OBJS) subdirs
-	$(LD) -r -o $@ $(OBJS)
+test.o: subdirs
+	@echo
 
 include $(TOPDIR)/Rules.makefile
 
 ### Dependencies ###
-list.o: list.cpp list.h
+test.o: test.cpp ../ds/list.h
