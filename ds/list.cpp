@@ -2,24 +2,30 @@
 #include <assert.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <string.h>
 
+#include <print.h>
 #include "list.h"
 
-static item *realloc_list(list *const lst, const size_t new_cap);
+const item_t    POISON_VALUE =  1; 
+const ptrdiff_t POISON_INDEX = -1; 
+
+static node *realloc_list(list *const lst, const size_t new_cap);
 static ptrdiff_t find_empty(list *const lst);
 static int verify_list(list *const lst);
 
-list *construct_list(list *const lst)
+list *construct_list(list *const lst, const size_t cap)
 {
         assert(lst);
-        assert(!lst->items);
+        assert(cap);
+        assert(!lst->nodes);
 
-        item *items = realloc_list(lst, INIT_CAP);
-        if (!items)
+        node *nodes = realloc_list(lst, cap);
+        if (!nodes)
                 return nullptr;
 
-        lst->items    = items;
-        lst->capacity = INIT_CAP;
+        lst->nodes    = nodes;
+        lst->capacity = cap;
         lst->tail     = -1;
         lst->head     = -1;
 
@@ -29,9 +35,9 @@ list *construct_list(list *const lst)
 void destruct_list(list *const lst)
 {
         assert(lst);
-        assert(lst->items);
+        assert(lst->nodes);
 
-        free(lst->items);
+        free(lst->nodes);
         lst->capacity =  0;
         lst->tail     = -1;
         lst->head     = -1;
@@ -46,9 +52,9 @@ ptrdiff_t list_insert_after(list *const lst, ptrdiff_t index, item_t value)
         // ptrdiff_t empty = find_empty(lst);
         ptrdiff_t empty = 0; 
 
-        lst->items[empty].next  = lst->items[index].next;
-        lst->items[index].next  = empty;
-        lst->items[empty].value = value;
+        lst->nodes[empty].next  = lst->nodes[index].next;
+        lst->nodes[index].next  = empty;
+        lst->nodes[empty].value = value;
 
         return empty;
 }
@@ -61,13 +67,52 @@ ptrdiff_t list_insert_after(list *const lst, ptrdiff_t index, item_t value)
  *
  * It is ANSI realloc() function wrapper.
  */
-static item *realloc_list(list *const lst, const size_t new_cap)
+static node *realloc_list(list *const lst, const size_t new_cap)
 {
         assert(lst);
         assert(new_cap);
+        assert(new_cap <= lst->capacity);
 
-        size_t cap  = new_cap * sizeof(item_t);
-        item *items = (item *)realloc(lst->items, cap);
+        static const node poison = {
+                                value: POISON_VALUE,
+                                next:  POISON_INDEX,
+                                prev:  POISON_INDEX,
+                        };
 
-        return items;
+        size_t cap = new_cap * sizeof(node);
+
+        node *const nodes = (node *)realloc(lst->nodes, cap);
+        if (!nodes) {
+                print("Can't realloc nodes\n");
+                return nodes;
+        }
+
+        for (size_t n = lst->capacity; n < new_cap; n++)
+                nodes[n] = poison;
+
+        return nodes;
 }
+
+void print_list(list *const lst)
+{
+        printf("Print list: \n");
+
+        printf("|");
+        for (size_t i = 0; i < lst->capacity; i++) {
+                printf(" %5.g |", lst->nodes[i].value);
+        }
+
+        printf("\n|");
+
+        for (size_t i = 0; i < lst->capacity; i++) {
+                printf(" %5.ld |", lst->nodes[i].next);
+        }
+
+        printf("\n|");
+
+        for (size_t i = 0; i < lst->capacity; i++) {
+                printf(" %5.ld |", lst->nodes[i].prev);
+        }
+}
+
+

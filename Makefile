@@ -70,11 +70,13 @@ HPATH  = $(TOPDIR)/include
 make: subdirs
 	$(OBJS)
 
-list: subdirs ds/main.o
+llist: subdirs ds/main.o
 	$(CXX) $(CXXFLAGS) -o list ds/main.o ds/ds.o
 
 test: subdirs tests/test.o
 	$(CXX) $(CXXFLAGS) -o test tests/test.o ds/ds.o
+	clear
+	./test
 
 .EXPORT_ALL_VARIABLES: CXX CXXFLAGS CPP
 

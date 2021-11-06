@@ -5,7 +5,11 @@ int main()
 {
         printf("List tests:\n");
         list lst = {0};
-        construct_list(&lst);
+
+        say_hello(2);
+        construct_list(&lst, 12);
+
+        print_list(&lst);
 
         destruct_list(&lst);
 

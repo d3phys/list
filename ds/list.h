@@ -2,18 +2,26 @@
 #define LIST_H_
 
 #include <stddef.h>
+#include <print.h>
+
+//#define TEST
+
+#ifdef TEST
+int say_hello(int a);
+#else /* TEST */
+static inline int say_hello(int a) { return 0; };
+#endif /* TEST */
 
 typedef double item_t;
 
-const size_t INIT_CAP = 8;
-
-struct item {
+struct node {
         item_t   value = 0;        
-        ptrdiff_t next = 0;        
+        ptrdiff_t next = -1;        
+        ptrdiff_t prev = -1;        
 };
 
 struct list {
-        item *items = nullptr;
+        node *nodes = nullptr;
         size_t capacity = 0;
 
         ptrdiff_t head = -1; 
@@ -27,7 +35,7 @@ enum list_state {
         INVALID_CAPACITY = 1 << 3,
 };
 
-list *construct_list(list *const lst);
+list *construct_list(list *const lst, const size_t cap);
 void destruct_list (list *const lst);
 
 ptrdiff_t list_insert_after (list *const lst, ptrdiff_t index, item_t item);
