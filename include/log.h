@@ -13,19 +13,16 @@ static const char HEADER[] = "<!DOCTYPE html>                      \n"
                                 "<html>                            \n"
                                    "<head>                         \n"
                                       "<meta charset=\"utf-8\" />  \n"
-                                      "<title>Stack log</title>    \n"
+                                      "<title>Log</title>          \n"
                                    "</head>                        \n"
                                 "<body>                            \n"
                                         "<pre><font color=\"navy\">\n"
-                                                    "┈┏━╮╭━┓┈┈┈┈┈┈┈\n"
-                                                    "┈┃┏┗┛┓┃┈┈┈┈┈┈┈\n"
-                                                    "┈╰┓▋▋┏╯┈┈┈┈┈┈┈\n"
-                                                    "╭━┻╮╲┗━━━━╮╭╮┈\n"
-                                                    "┃▎▎┃╲╲╲╲╲╲┣━╯┈\n"
-                                                    "╰━┳┻▅╯╲╲╲╲┃┈┈┈\n"
-                                                    "┈┈╰━┳┓┏┳┓┏╯┈┈┈\n"
-                                                    "┈┈┈┈┗┻┛┗┻┛┈┈┈┈\n"
-                                                    "       </font>\n";  
+                                                        "░▄▄▄▄░    \n"
+                                                        "▀▀▄██►    \n"
+                                                        "▀▀███►    \n"
+                                                        "░▀███►░█► \n"
+                                                        "▒▄████▀▀  \n"
+                                                        "   </font>\n";  
                                                     
 static inline FILE *create_log(); //setvbuf
 static FILE *LOG = create_log();
@@ -103,6 +100,15 @@ static void close_log()
         } while (0)
 #endif /* NOLOG */
 
+#ifdef NLOG
+#define qlog(fmt, ...) (void(0))
+#else
+#define qlog(fmt, ...)                              \
+        do {                                        \
+                fprintf(get_log(), fmt, ##__VA_ARGS__); \
+        } while (0)
+
+#endif /* NOLOG */
 #endif /* LOG_H */
 
 

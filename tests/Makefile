@@ -15,4 +15,5 @@ test.o: subdirs
 include $(TOPDIR)/Rules.makefile
 
 ### Dependencies ###
-test.o: test.cpp ../ds/list.h /home/d3phys/Code/list/include/print.h
+test.o: test.cpp ../ds/list.h /home/d3phys/Code/list/include/log.h \
+ /home/d3phys/Code/list/include/config.h

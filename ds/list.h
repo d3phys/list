@@ -2,7 +2,7 @@
 #define LIST_H_
 
 #include <stddef.h>
-#include <print.h>
+#include <log.h>
 
 //#define TEST
 
@@ -15,9 +15,9 @@ static inline int say_hello(int a) { return 0; };
 typedef double item_t;
 
 struct node {
-        item_t   value = 0;        
         ptrdiff_t next = -1;        
         ptrdiff_t prev = -1;        
+        item_t    data =  0;        
 };
 
 struct list {
@@ -26,6 +26,10 @@ struct list {
 
         ptrdiff_t head = -1; 
         ptrdiff_t tail = -1; 
+        ptrdiff_t free = -1;
+
+        size_t n_free = 0;
+        size_t n_data = 0;
 };
 
 enum list_state {
@@ -44,12 +48,11 @@ ptrdiff_t list_insert_before(list *const lst, ptrdiff_t index, item_t item);
 ptrdiff_t list_delete(list *const lst, ptrdiff_t index);
 
 ptrdiff_t list_insert_back(list *const lst, item_t item);
-ptrdiff_t list_delete_back(list *const lst, item_t item);
 
 ptrdiff_t list_insert_front(list *const lst, item_t item);
-ptrdiff_t list_delete_front(list *const lst, item_t item);
 
 void print_list(list *const lst);
+void dump_list(list *const lst);
 
 
 #endif /* LIST_H_ */

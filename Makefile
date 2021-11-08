@@ -75,7 +75,6 @@ llist: subdirs ds/main.o
 
 test: subdirs tests/test.o
 	$(CXX) $(CXXFLAGS) -o test tests/test.o ds/ds.o
-	clear
 	./test
 
 .EXPORT_ALL_VARIABLES: CXX CXXFLAGS CPP
