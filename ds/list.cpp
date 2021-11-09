@@ -14,6 +14,52 @@ static node *realloc_list(list *const lst, const size_t new_cap);
 static ptrdiff_t find_empty(list *const lst);
 static int verify_list(list *const lst);
 
+ptrdiff_t sort_list(list *const lst)
+{
+        assert(lst && lst->nodes);
+
+        node temp = {0};
+
+        node *nodes  = lst->nodes;
+        ptrdiff_t nd = lst->head;
+
+        ptrdiff_t wr = 0;
+        for (wr = 1; nd != 0; wr++) {
+                if (wr != nd) {
+                        if (nodes[wr].prev != FREE_PREV) {
+                                nodes[nodes[wr].prev].next = nd;
+                                nodes[nodes[wr].next].prev = nd;
+                        }
+
+                        temp      = nodes[wr];
+                        nodes[wr] = nodes[nd];
+                        nodes[nd] = temp;
+                }
+
+                nodes[wr].prev = wr - 1;
+                nodes[wr - 1].next = wr;
+
+                nd = nodes[wr].next;
+        }
+
+        lst->free = wr;
+
+        while (wr < lst->capacity) {
+                nodes[wr].next = wr + 1;
+                wr++;
+        }
+
+        nodes[0].prev = 0;
+        nodes[0].next = 0;
+
+        nodes[lst->capacity - 1].next = 0;
+
+        lst->tail = lst->n_nodes;
+        lst->head = 1;
+
+        return 1;
+}
+
 static ptrdiff_t list_insert(list *const lst, 
                              item_t data, ptrdiff_t next, ptrdiff_t prev)
 {
@@ -41,6 +87,8 @@ $               (node *nodes = realloc_list(lst, lst->capacity * 2);)
         if (!next)
                 lst->tail = free;
 
+        lst->n_nodes++;
+
         return free;
 }
 
@@ -53,6 +101,7 @@ list *construct_list(list *const lst, const size_t cap)
         lst->head     = 0;
         lst->tail     = 0;
         lst->capacity = 1;
+        lst->n_nodes  = 0;
 
 $       (node *nodes = realloc_list(lst, cap + 1);)
         if (!nodes)
@@ -90,18 +139,20 @@ ptrdiff_t list_delete(list *const lst, ptrdiff_t pos)
 
         if (lst->head == pos)
                 lst->head = lst->nodes[pos].next;
+        else
+                nodes[nodes[pos].prev].next = nodes[pos].next; 
 
         if (lst->tail == pos)
                 lst->tail = lst->nodes[pos].prev;
-
-        nodes[nodes[pos].next].prev = nodes[pos].prev; 
-        nodes[nodes[pos].prev].next = nodes[pos].next; 
+        else
+                nodes[nodes[pos].next].prev = nodes[pos].prev; 
 
         nodes[pos].prev = FREE_PREV;
         nodes[pos].data = FREE_DATA;
 
         nodes[pos].next = lst->free;
         lst->free = pos;
+        lst->n_nodes--;
 
         return pos;
 }

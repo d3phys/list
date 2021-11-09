@@ -28,8 +28,7 @@ struct list {
         ptrdiff_t tail = -1; 
         ptrdiff_t free = -1;
 
-        size_t n_free = 0;
-        size_t n_data = 0;
+        size_t n_nodes =  0;
 };
 
 enum list_state {
@@ -41,6 +40,7 @@ enum list_state {
 
 list *construct_list(list *const lst, const size_t cap);
 void destruct_list (list *const lst);
+ptrdiff_t sort_list(list *const lst);
 
 ptrdiff_t list_insert_after (list *const lst, ptrdiff_t index, item_t item);
 ptrdiff_t list_insert_before(list *const lst, ptrdiff_t index, item_t item);
