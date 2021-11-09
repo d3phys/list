@@ -109,6 +109,7 @@ static void close_log()
         } while (0)
 
 #endif /* NOLOG */
+
 #endif /* LOG_H */
 
 
