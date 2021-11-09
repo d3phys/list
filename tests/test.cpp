@@ -21,9 +21,24 @@ $       (list_insert_back(&lst, 320);)
 $       (list_insert_front(&lst, 320);)
         dump_list(&lst);
 $       (list_insert_back(&lst, 320);)
-
+        dump_list(&lst);
+$       (list_delete(&lst, 3);)
+$       (list_delete(&lst, 4);)
+$       (list_delete(&lst, 5);)
+$       (list_delete(&lst, 1);)
+$       (list_delete(&lst, 2);)
         dump_list(&lst);
 
+$       (list_insert_back(&lst, 10);)
+        dump_list(&lst);
+$       (list_insert_back(&lst, 20);)
+        dump_list(&lst);
+$       (list_insert_back(&lst, 30);)
+        dump_list(&lst);
+$       (list_insert_back(&lst, 40);)
+        dump_list(&lst);
+$       (list_insert_back(&lst, 50);)
+        dump_list(&lst);
         destruct_list(&lst);
 
         return 0;

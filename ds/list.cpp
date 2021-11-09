@@ -8,7 +8,7 @@
 #include "list.h"
 
 const item_t    FREE_DATA =  1337; 
-const ptrdiff_t FREE_PREV = 0; 
+const ptrdiff_t FREE_PREV = -1; 
 
 static node *realloc_list(list *const lst, const size_t new_cap);
 static ptrdiff_t find_empty(list *const lst);
@@ -35,8 +35,11 @@ $               (node *nodes = realloc_list(lst, lst->capacity * 2);)
                 .data = data, 
         };
 
-        if (!lst->nodes[free].next)
+        if (!prev)
                 lst->head = free;
+
+        if (!next)
+                lst->tail = free;
 
         return free;
 }
@@ -85,6 +88,12 @@ ptrdiff_t list_delete(list *const lst, ptrdiff_t pos)
 
         node *const nodes = lst->nodes;
 
+        if (lst->head == pos)
+                lst->head = lst->nodes[pos].next;
+
+        if (lst->tail == pos)
+                lst->tail = lst->nodes[pos].prev;
+
         nodes[nodes[pos].next].prev = nodes[pos].prev; 
         nodes[nodes[pos].prev].next = nodes[pos].next; 
 
@@ -102,9 +111,10 @@ ptrdiff_t list_insert_after(list *const lst, ptrdiff_t pos, item_t data)
         assert(lst && lst->nodes);
 
         ptrdiff_t ins = list_insert(lst, data, lst->nodes[pos].next, pos);
-        if (ins) {
-                if (lst->nodes[pos].prev)
+        if (ins && pos) {
+                if (lst->nodes[pos].next)
                         lst->nodes[lst->nodes[pos].next].prev = ins;
+
                 lst->nodes[pos].next = ins;
         }
 
@@ -116,7 +126,7 @@ ptrdiff_t list_insert_before(list *const lst, ptrdiff_t pos, item_t data)
         assert(lst && lst->nodes);
 
         ptrdiff_t ins = list_insert(lst, data, pos, lst->nodes[pos].prev);
-        if (ins) {
+        if (ins && pos) {
                 if (lst->nodes[pos].prev)
                         lst->nodes[lst->nodes[pos].prev].next = ins;
 
@@ -129,21 +139,13 @@ ptrdiff_t list_insert_before(list *const lst, ptrdiff_t pos, item_t data)
 ptrdiff_t list_insert_front(list *const lst, item_t data)
 {
         assert(lst && lst->nodes);
-
-        if (!lst->head)
-                lst->head = lst->free;
-
         return list_insert_before(lst, lst->head, data);
 }
 
 ptrdiff_t list_insert_back(list *const lst, item_t data)
 {
         assert(lst && lst->nodes);
-
-        if (!lst->head)
-                lst->head = lst->free;
-
-        return list_insert_before(lst, lst->head, data);
+        return list_insert_after(lst, lst->tail, data);
 }
 
 /**
@@ -226,7 +228,7 @@ void dump_list(list *const lst)
                                 "}                                                                                      \n",
                                 i, i, i, lst->nodes[i].prev, lst->nodes[i].data, lst->nodes[i].next);
 
-                if (lst->nodes[i].next != 0 && lst->nodes[i].prev != FREE_PREV)
+                if (lst->nodes[i].prev != FREE_PREV)
                         fprintf(file, "%lu:n -> %ld:n[color=darkgoldenrod2, style=dashed]\n", i, lst->nodes[i].next);
                 else
                         fprintf(file, "%lu:n -> %ld:n[color=mediumpurple4 ]\n", i, lst->nodes[i].next);
