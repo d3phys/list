@@ -7,12 +7,16 @@
 # 2021, d3phys
 #
 
+#
+# Configuration 
+#
+include CONFIG
 
 #
 # Awesome flags collection
-# Copyright (C) 2021, 2022 ded32
+# Copyright (C) 2021, 2022 ded32, the TXLib creator
 #
-CXXFLAGS = -g -std=c++14 -fmax-errors=100 -Wall -Wextra  	   \
+CXXFLAGS = -g --static-pie -std=c++14 -fmax-errors=100 -Wall -Wextra  	   \
 	   -Weffc++ -Waggressive-loop-optimizations -Wc++0x-compat 	   \
 	   -Wc++11-compat -Wc++14-compat -Wcast-align -Wcast-qual 	   \
 	   -Wchar-subscripts -Wconditionally-supported -Wconversion        \
@@ -55,7 +59,11 @@ CXXFLAGS = -g -std=c++14 -fmax-errors=100 -Wall -Wextra  	   \
 	   -fsanitize=vptr                                                 \
 	   -lm -pie                                          
 
-SUBDIRS = ds tests 
+ifdef CONFIG_LIST_DEV
+CXXFLAGS += -D DEBUG
+endif
+
+SUBDIRS = ds tests dev
 
 CXX = g++
 CPP = $(CXX) -E 
@@ -67,17 +75,23 @@ TOPDIR	:= $(shell if [ "$$PWD" != "" ]; then echo $$PWD; else pwd; fi)
 #
 HPATH  = $(TOPDIR)/include
 
+DEBUG := false 
+
 make: subdirs
 	$(OBJS)
 
 llist: subdirs ds/main.o
 	$(CXX) $(CXXFLAGS) -o list ds/main.o ds/ds.o
 
-test: subdirs tests/test.o
-	$(CXX) $(CXXFLAGS) -o test tests/test.o ds/ds.o
+test: subdirs
+	cd tests && $(MAKE)
+	$(CXX) $(CXXFLAGS) -o test tests/test.o ds/ds.o dev/dev.o
 	./test
 
-.EXPORT_ALL_VARIABLES: CXX CXXFLAGS CPP
+touch:
+	@find $(HPATH) -print -exec touch {} \;
+
+.EXPORT_ALL_VARIABLES: CXX CXXFLAGS CPP DEBUG
 
 include $(TOPDIR)/Rules.makefile
 

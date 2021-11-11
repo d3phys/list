@@ -7,7 +7,7 @@
 # 2021, d3phys
 #
 
-OBJS = list.o
+OBJS  = list.o
 
 ds.o: $(OBJS) subdirs
 	$(LD) -r -o $@ $(OBJS)
@@ -16,4 +16,5 @@ include $(TOPDIR)/Rules.makefile
 
 ### Dependencies ###
 list.o: list.cpp /home/d3phys/Code/list/include/log.h \
- /home/d3phys/Code/list/include/config.h list.h
+ /home/d3phys/Code/list/include/config.h \
+ /home/d3phys/Code/list/include/list.h

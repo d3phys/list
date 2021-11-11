@@ -3,20 +3,18 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-
 #include <log.h>
-#include "list.h"
 
-const item_t    FREE_DATA =  1337; 
-const ptrdiff_t FREE_PREV = -1; 
+#include <list.h>
 
 static node *realloc_list(list *const lst, const size_t new_cap);
-static ptrdiff_t find_empty(list *const lst);
-static int verify_list(list *const lst);
+
+#define verify_list(lst) $(verify_list(lst))
 
 ptrdiff_t sort_list(list *const lst)
 {
         assert(lst && lst->nodes);
+        verify_list(lst);
 
         node temp = {0};
 
@@ -44,19 +42,21 @@ ptrdiff_t sort_list(list *const lst)
 
         lst->free = wr;
 
-        while (wr < lst->capacity) {
+        for (; wr < lst->capacity; wr++)
                 nodes[wr].next = wr + 1;
-                wr++;
-        }
 
-        nodes[0].prev = 0;
-        nodes[0].next = 0;
+        nodes[0] = {
+                .next = 0,
+                .prev = 0,
+                .data = 0,
+        };
 
         nodes[lst->capacity - 1].next = 0;
 
         lst->tail = lst->n_nodes;
         lst->head = 1;
 
+        verify_list(lst);
         return 1;
 }
 
@@ -64,6 +64,7 @@ static ptrdiff_t list_insert(list *const lst,
                              item_t data, ptrdiff_t next, ptrdiff_t prev)
 {
         assert(lst && lst->nodes);
+        verify_list(lst);
 
         if (!lst->free) {
 $               (node *nodes = realloc_list(lst, lst->capacity * 2);)
@@ -88,7 +89,6 @@ $               (node *nodes = realloc_list(lst, lst->capacity * 2);)
                 lst->tail = free;
 
         lst->n_nodes++;
-
         return free;
 }
 
@@ -113,6 +113,7 @@ $       (node *nodes = realloc_list(lst, cap + 1);)
                 .data = 0, 
         };
 
+        verify_list(lst);
         return lst;
 }
 
@@ -128,6 +129,7 @@ $       (free(lst->nodes);)
 ptrdiff_t list_delete(list *const lst, ptrdiff_t pos)
 {
         assert(lst && lst->nodes);
+        verify_list(lst);
 
         assert(lst->nodes[pos].prev != FREE_PREV);
         if (lst->nodes[pos].prev == FREE_PREV) {
@@ -154,12 +156,14 @@ ptrdiff_t list_delete(list *const lst, ptrdiff_t pos)
         lst->free = pos;
         lst->n_nodes--;
 
+        verify_list(lst);
         return pos;
 }
 
 ptrdiff_t list_insert_after(list *const lst, ptrdiff_t pos, item_t data)
 {
         assert(lst && lst->nodes);
+        verify_list(lst);
 
         ptrdiff_t ins = list_insert(lst, data, lst->nodes[pos].next, pos);
         if (ins && pos) {
@@ -169,12 +173,14 @@ ptrdiff_t list_insert_after(list *const lst, ptrdiff_t pos, item_t data)
                 lst->nodes[pos].next = ins;
         }
 
+        verify_list(lst);
         return ins;
 }
 
 ptrdiff_t list_insert_before(list *const lst, ptrdiff_t pos, item_t data)
 {
         assert(lst && lst->nodes);
+        verify_list(lst);
 
         ptrdiff_t ins = list_insert(lst, data, pos, lst->nodes[pos].prev);
         if (ins && pos) {
@@ -184,18 +190,23 @@ ptrdiff_t list_insert_before(list *const lst, ptrdiff_t pos, item_t data)
                 lst->nodes[pos].prev = ins;
         }
 
+        verify_list(lst);
         return ins;
 }
 
 ptrdiff_t list_insert_front(list *const lst, item_t data)
 {
         assert(lst && lst->nodes);
+        verify_list(lst);
+
         return list_insert_before(lst, lst->head, data);
 }
 
 ptrdiff_t list_insert_back(list *const lst, item_t data)
 {
         assert(lst && lst->nodes);
+        verify_list(lst);
+
         return list_insert_after(lst, lst->tail, data);
 }
 
@@ -235,68 +246,4 @@ $       (lst->free = lst->capacity;)
         return nodes;
 }
 
-void dump_list(list *const lst)
-{
-        assert(lst);
-
-        static unsigned dump_num = 0;
-
-        static char buf[512] = {0};
-        snprintf(buf, sizeof(buf), "dump%u.dot", dump_num);
-
-        FILE *file = fopen(buf, "w");
-
-//R"(afs///)"
-        fprintf(file, "digraph {                                                        \n"
-                                "node[penwidth=2, shape=box, color=grey, fillcolor=white, style=\"rounded, filled\", fontname=\"Courier\"]\n"
-                                "fontname=\"Courier\"\n"
-                                "dpi=57\n"
-		                "edge[color=darkgrey, arrowhead=onormal, arrowsize=1.6, penwidth=1.2]                                      \n"
-                                "graph[fillcolor=lightgreen, ranksep=1.3, nodesep=0.5,style=\"rounded,filled\",color=green, penwidth=2]                \n"
-                                "compound=true;                                                       \n"
-                                "                                                       \n"
-                                "newrank = true;                                        \n"
-                                "rankdir = LR;                                          \n",
-                                dump_num);
-
-        fprintf(file, "0");
-        for (size_t i = 1; i < lst->capacity; i++) {
-                fprintf(file, "-> %lu", i);
-        }
-        fprintf(file, "[style=invis, weight=1, minlen=\"1.5\"]");
-
-                fprintf(file, "free->%ld:n[color=cadetblue]\n", lst->free);
-
-                fprintf(file, "tail->%ld:p[color=cadetblue]\n", lst->tail);
-
-                fprintf(file, "head->%ld:n[color=cadetblue]\n", lst->head);
-
-        for (size_t i = 0; i < lst->capacity; i++) {
-                fprintf(file, "subgraph cluster%lu {                                                                     \n"
-                                "       label = %lu;                                                                    \n"
-                                "       fontsize= 20;                                                                    \n"
-                                "       %lu [shape=record, label=\"<p>prev: %ld | data: %lg | <n>next: %ld\"]     \n"
-                                "}                                                                                      \n",
-                                i, i, i, lst->nodes[i].prev, lst->nodes[i].data, lst->nodes[i].next);
-
-                if (lst->nodes[i].prev != FREE_PREV)
-                        fprintf(file, "%lu:n -> %ld:n[color=darkgoldenrod2, style=dashed]\n", i, lst->nodes[i].next);
-                else
-                        fprintf(file, "%lu:n -> %ld:n[color=mediumpurple4 ]\n", i, lst->nodes[i].next);
-
-                if (lst->nodes[i].prev != FREE_PREV)
-                        fprintf(file, "%lu:p -> %ld:p[color=darkslategray, style=dashed]\n", i, lst->nodes[i].prev);
-        }
-
-
-        fprintf(file, "\n}");
-        fclose(file);
-
-        snprintf(buf, sizeof(buf), "dot -Tsvg dump%u.dot -o dump%u.svg", dump_num, dump_num);
-        system(buf);
-
-        log("List dump\n <img src=\"dump%u.svg\"/>\n", dump_num);
-
-        dump_num++;
-}
 

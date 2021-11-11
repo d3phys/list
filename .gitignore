@@ -7,3 +7,6 @@ tags
 # Binary files
 list
 test
+
+# Log file
+log/

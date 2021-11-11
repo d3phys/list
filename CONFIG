@@ -1,0 +1,12 @@
+#
+# Make configuration file
+# 2021, d3phys
+#
+
+
+# Enables list dump and verification
+CONFIG_LIST_DEV     = on
+
+# Enables log system
+CONFIG_LOG_FILE_DEV = on
+
