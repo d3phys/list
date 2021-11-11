@@ -9,6 +9,9 @@
 
 static node *realloc_list(list *const lst, const size_t new_cap);
 
+/*
+ * Oooh my... Is it TXLib style?
+ */
 #define verify_list(lst) $(verify_list(lst))
 
 ptrdiff_t sort_list(list *const lst)
@@ -245,5 +248,7 @@ $       (lst->free = lst->capacity;)
 
         return nodes;
 }
+
+#undef verify_list(lst) $(verify_list(lst))
 
 
