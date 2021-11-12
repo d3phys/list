@@ -63,6 +63,10 @@ ifdef CONFIG_LIST_DEV
 CXXFLAGS += -D DEBUG
 endif
 
+ifdef CONFIG_LOG_FILE_DEV
+CXXFLAGS += -D LOG_FILE 
+endif
+
 SUBDIRS = ds tests dev
 
 CXX = g++

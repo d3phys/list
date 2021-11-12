@@ -24,7 +24,7 @@ static const char HEADER[] = "<!DOCTYPE html>                      \n"
                                                         "▒▄████▀▀  \n"
                                                         "   </font>\n";  
                                                     
-static inline FILE *create_log(); //setvbuf
+static inline FILE *create_log();
 static FILE *LOG = create_log();
 static void close_log();
 inline FILE *get_log();
@@ -89,7 +89,7 @@ static void close_log()
 
 #define $(code) log("%s\n", #code); code
 
-#ifdef NLOG
+#ifndef LOG_FILE 
 #define log(fmt, ...) (void(0))
 #else
 #define log(fmt, ...)                                                                         \
@@ -98,9 +98,9 @@ static void close_log()
                         fmt, local_time("%x %H:%M:%S"),                                       \
                         __FILE__, __func__, __LINE__, ##__VA_ARGS__);                         \
         } while (0)
-#endif /* NOLOG */
+#endif /* LOG_FILE */
 
-#ifdef NLOG
+#ifndef LOG_FILE 
 #define qlog(fmt, ...) (void(0))
 #else
 #define qlog(fmt, ...)                              \
@@ -108,7 +108,7 @@ static void close_log()
                 fprintf(get_log(), fmt, ##__VA_ARGS__); \
         } while (0)
 
-#endif /* NOLOG */
+#endif /* LOG_FILE */
 
 #endif /* LOG_H */
 

@@ -17,6 +17,7 @@ struct node {
 
 struct list {
         node *nodes = nullptr;
+
         size_t capacity = 0;
 
         ptrdiff_t head = 0; 
@@ -24,13 +25,18 @@ struct list {
         ptrdiff_t free = 0;
 
         size_t n_nodes = 0;
+
+        int linear     = 0;
 };
 
+ptrdiff_t get_real_pos(list *const lst, ptrdiff_t log_pos);
+
+void swap_list(list *const lst1, list *const lst2);
 
 list *construct_list(list *const lst, const size_t cap);
 void   destruct_list(list *const lst);
 
-ptrdiff_t sort_list(list *const lst);
+ptrdiff_t make_linear_list(list *const lst);
 
 ptrdiff_t list_delete(list *const lst, ptrdiff_t index);
 

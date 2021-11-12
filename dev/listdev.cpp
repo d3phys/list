@@ -95,7 +95,7 @@ void dump_list(const list *const lst)
                                                 edge [color = darkgrey, arrowhead = onormal, arrowsize = 1.6, penwidth = 1.2]
 
                                                 graph[fillcolor = lightgreen, ranksep = 1.3, nodesep = 0.5,
-                                                      style = "rounded,filled",color = green, penwidth = 2]
+                                                      style = "rounded, filled",color = green, penwidth = 2]
 
                                                 node [penwidth = 2, shape = box, color = grey, 
                                                       fillcolor = white, style = "rounded, filled", fontname = "Courier"]

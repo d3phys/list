@@ -3,21 +3,72 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-#include <log.h>
 
+#include <log.h>
 #include <list.h>
 
+
 static node *realloc_list(list *const lst, const size_t new_cap);
+static inline int validate_position(list *const lst, ptrdiff_t pos);
+
+static ptrdiff_t list_insert(list *const lst, 
+                             item_t data, ptrdiff_t next, ptrdiff_t prev);
 
 /*
  * Oooh my... Is it TXLib style?
  */
 #define verify_list(lst) $(verify_list(lst))
 
-ptrdiff_t sort_list(list *const lst)
+/*
+ * Exchanges the contents of the container with those of other.
+ * Does not invoke any move, copy, or swap operations on individual elements.
+ */
+void swap_list(list *const lst1, list *const lst2)
+{
+        assert(lst1 && lst2);
+        verify_list(lst1);
+        verify_list(lst2);
+
+        list temp  = *lst2;
+        *lst1      = *lst2;
+        *lst2      = temp;
+}
+
+/*
+ * Gets physical address (index) from logical index.
+ *      - O(n) complexity at random list
+ *      - O(1) complexity after 'make_linear_list()'
+ */
+ptrdiff_t get_real_pos(list *const lst, ptrdiff_t log_pos)
+{
+        assert(lst);
+        if (validate_position(lst, log_pos))
+                return 0;
+
+        verify_list(lst);
+
+        if (lst->linear)
+                return log_pos;
+
+        ptrdiff_t pos = lst->head;
+        while (--log_pos > 0)
+                pos = lst->nodes[pos].next;
+
+        return pos;
+}
+
+/*
+ * Rearranges list. And makes logical index = physical index
+ *     - O(n) complexity
+ *     - O(1) additional memory required
+ */
+ptrdiff_t make_linear_list(list *const lst)
 {
         assert(lst && lst->nodes);
         verify_list(lst);
+
+        if (lst->linear)
+                return lst->head;
 
         node temp = {0};
 
@@ -56,11 +107,12 @@ ptrdiff_t sort_list(list *const lst)
 
         nodes[lst->capacity - 1].next = 0;
 
-        lst->tail = lst->n_nodes;
-        lst->head = 1;
+        lst->tail   = lst->n_nodes;
+        lst->head   = 1;
+        lst->linear = 1;
 
         verify_list(lst);
-        return 1;
+        return lst->head;
 }
 
 static ptrdiff_t list_insert(list *const lst, 
@@ -163,15 +215,6 @@ ptrdiff_t list_delete(list *const lst, ptrdiff_t pos)
         return pos;
 }
 
-static inline int validate_position(list *const lst, ptrdiff_t pos) 
-{
-        int ret = pos < 0 || pos >= lst->capacity; 
-        if (ret)
-                log("<font color=\"red\">Invalid index</font>\n");
-
-        return ret;
-}
-
 ptrdiff_t list_insert_after(list *const lst, ptrdiff_t pos, item_t data)
 {
         assert(lst && lst->nodes);
@@ -262,6 +305,15 @@ $       (lst->free = lst->capacity;)
         lst->nodes    = nodes;
 
         return nodes;
+}
+
+static inline int validate_position(list *const lst, ptrdiff_t pos) 
+{
+        int ret = pos < 0 || pos >= lst->capacity; 
+        if (ret)
+                log("<font color=\"red\">Invalid index</font>\n");
+
+        return ret;
 }
 
 #undef verify_list(lst) $(verify_list(lst))
