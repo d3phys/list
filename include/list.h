@@ -26,12 +26,6 @@ struct list {
         size_t n_nodes = 0;
 };
 
-enum list_state {
-        INVALID_HEAD     = 1 << 0,
-        INVALID_TAIL     = 1 << 1,
-        INVALID_ITEMS    = 1 << 2,
-        INVALID_CAPACITY = 1 << 3,
-};
 
 list *construct_list(list *const lst, const size_t cap);
 void   destruct_list(list *const lst);
@@ -47,9 +41,9 @@ ptrdiff_t list_insert_back (list *const lst, item_t item);
 ptrdiff_t list_insert_front(list *const lst, item_t item);
 
 #ifdef DEBUG 
-ptrdiff_t verify_list(const list *const lst);
+ptrdiff_t verify_list(list *const lst);
 #else /* DEBUG */
-static inline ptrdiff_t verify_list(const list *const lst) { return 0; }
+static inline ptrdiff_t verify_list(list *const lst) { return 0; }
 #endif /* DEBUG */
 
 #ifdef DEBUG 

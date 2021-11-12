@@ -2,20 +2,35 @@
 #include <assert.h>
 #include <log.h>
 
-ptrdiff_t verify_list(const list *const lst)
+ptrdiff_t verify_list(list *const lst)
 {
         assert(lst);
 
         size_t n_nodes = 0;
         node *nodes = lst->nodes;
+        ptrdiff_t it = 0;
 
-        ptrdiff_t it = lst->head;
+        if (nodes[0].prev != 0 || nodes[0].next != 0)
+                goto verify_error;
+
+        it = lst->head;
         if (nodes[it].prev != 0)
                 goto verify_error;
 
         for (it = 1; it < lst->capacity; it++) {
-                if (nodes[it].prev == FREE_PREV)
+
+                if (nodes[it].prev == FREE_PREV) {
+                        if (nodes[it].next < 0 || nodes[it].next > lst->capacity)
+                                goto verify_error;
+
                         continue;
+                }
+
+                if (nodes[it].prev < 0 || nodes[it].prev > lst->capacity) 
+                        goto verify_error;
+
+                if (nodes[it].next < 0 || nodes[it].next > lst->capacity) 
+                        goto verify_error;
 
                 if (nodes[nodes[it].prev].next != it && it != lst->head)
                         goto verify_error;
@@ -25,6 +40,20 @@ ptrdiff_t verify_list(const list *const lst)
 
                 n_nodes++;
         }
+        
+        it = lst->free;
+        for (ptrdiff_t i = 1; i < lst->capacity; i++) {
+                if (nodes[it].prev != FREE_PREV && it)
+                        goto verify_error;
+
+                if (nodes[it].next < 0 || nodes[it].next > lst->capacity)
+                        goto verify_error;
+
+                it = nodes[it].next;
+        }
+
+        if (it != 0)
+                goto verify_error;
 
         it = lst->tail;
         if (nodes[it].next != 0)
@@ -35,12 +64,15 @@ ptrdiff_t verify_list(const list *const lst)
                 goto verify_error;
         }
 
-        log("<font color=\"green\">VERIFICATION PASSED</font>\n");
+
+        log("<font color=\"green\">verification passed</font>\n");
         return 0;
 
 verify_error:
         log("<font color=\"red\">DAMAGED NODE:  %ld</font>\n", it);
 $       (dump_list(lst);)
+        destruct_list(lst);
+        exit(1);
         return it;
 }
 

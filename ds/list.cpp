@@ -163,9 +163,21 @@ ptrdiff_t list_delete(list *const lst, ptrdiff_t pos)
         return pos;
 }
 
+static inline int validate_position(list *const lst, ptrdiff_t pos) 
+{
+        int ret = pos < 0 || pos >= lst->capacity; 
+        if (ret)
+                log("<font color=\"red\">Invalid index</font>\n");
+
+        return ret;
+}
+
 ptrdiff_t list_insert_after(list *const lst, ptrdiff_t pos, item_t data)
 {
         assert(lst && lst->nodes);
+        if (validate_position(lst, pos))
+                return 0;
+
         verify_list(lst);
 
         ptrdiff_t ins = list_insert(lst, data, lst->nodes[pos].next, pos);
@@ -183,6 +195,9 @@ ptrdiff_t list_insert_after(list *const lst, ptrdiff_t pos, item_t data)
 ptrdiff_t list_insert_before(list *const lst, ptrdiff_t pos, item_t data)
 {
         assert(lst && lst->nodes);
+        if (validate_position(lst, pos))
+                return 0;
+
         verify_list(lst);
 
         ptrdiff_t ins = list_insert(lst, data, pos, lst->nodes[pos].prev);
