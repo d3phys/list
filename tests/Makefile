@@ -14,6 +14,4 @@ make: $(OBJS)
 include $(TOPDIR)/Rules.makefile
 
 ### Dependencies ###
-test.o: test.cpp /home/d3phys/Code/list/include/list.h \
- /home/d3phys/Code/list/include/log.h \
- /home/d3phys/Code/list/include/config.h
+test.o: test.cpp /home/d3phys/Code/hash-table/list/include/list.h

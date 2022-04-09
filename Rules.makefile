@@ -30,5 +30,5 @@ dep:
 # Common rules
 #
 %.o : %.cpp
-	$(CXX) $(CXXFLAGS) -c -I$(HPATH) $< -o $@
+	$(CXX) $(CXXFLAGS) -c $(addprefix -I,$(HPATH)) $< -o $@
 

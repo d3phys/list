@@ -4,15 +4,16 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <log.h>
+#include <logs.h>
 #include <list.h>
 
 
 static node *realloc_list(list *const lst, const size_t new_cap);
 static inline int validate_position(list *const lst, ptrdiff_t pos);
 
-static ptrdiff_t list_insert(list *const lst, 
-                             item_t data, ptrdiff_t next, ptrdiff_t prev);
+static ptrdiff_t list_insert(
+        list *const lst, item_t data, ptrdiff_t next, ptrdiff_t prev
+);
 
 /*
  * Oooh my... Is it TXLib style?
@@ -115,9 +116,9 @@ ptrdiff_t make_linear_list(list *const lst)
         return lst->head;
 }
 
-static ptrdiff_t list_insert(list *const lst, 
-                             item_t data, ptrdiff_t next, ptrdiff_t prev)
-{
+static ptrdiff_t list_insert(
+        list *const lst, item_t data, ptrdiff_t next, ptrdiff_t prev
+) {
         assert(lst && lst->nodes);
         verify_list(lst);
 
@@ -188,7 +189,7 @@ ptrdiff_t list_delete(list *const lst, ptrdiff_t pos)
 
         assert(lst->nodes[pos].prev != FREE_PREV);
         if (lst->nodes[pos].prev == FREE_PREV) {
-                log("Unable to release freed item\n");
+                fprintf(logs, "Unable to release freed item\n");
                 return pos;
         }
 
@@ -311,7 +312,7 @@ static inline int validate_position(list *const lst, ptrdiff_t pos)
 {
         int ret = pos < 0 || pos >= lst->capacity; 
         if (ret)
-                log("<font color=\"red\">Invalid index</font>\n");
+                fprintf(logs, "<font color=\"red\">Invalid index</font>\n");
 
         return ret;
 }

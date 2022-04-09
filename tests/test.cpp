@@ -1,12 +1,13 @@
-#include <list.h>
 #include <stdio.h>
+#include <list.h>
+#include <logs.h>
 
 int main()
 {
         printf("List tests:\n");
         list lst = {0};
         construct_list(&lst, 4);
-        log("hey\n");
+        fprintf(logs,"hey\n");
 
 $       (dump_list(&lst);)
 $       (list_insert_before(&lst, 0, 3);)
@@ -18,8 +19,8 @@ $       (dump_list(&lst);)
 $       (list_insert_front(&lst, 1);)
 $       (dump_list(&lst);)
 $       (list_insert_back(&lst, 5);)
-$       (log("POSITION: %ld\n", get_real_pos(&lst, 2));)
-$       (log("POSITION: %ld\n", get_real_pos(&lst, 1));)
+$       (fprintf(logs,"POSITION: %ld\n", get_real_pos(&lst, 2));)
+$       (fprintf(logs,"POSITION: %ld\n", get_real_pos(&lst, 1));)
 $       (list_insert_after(&lst, 3213, 3213);)
 $       (dump_list(&lst);)
 $       (make_linear_list(&lst);)

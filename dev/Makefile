@@ -7,11 +7,8 @@
 # 2021, d3phys
 #
 
-OBJS = 
 
-ifdef CONFIG_LIST_DEV
-OBJS += listdev.o
-endif
+OBJS = listdev.o
 
 #
 # I'll fix this 'dummy' style... Later...
@@ -25,6 +22,4 @@ dev.o: $(OBJS) subdirs
 include $(TOPDIR)/Rules.makefile
 
 ### Dependencies ###
-listdev.o: listdev.cpp /home/d3phys/Code/list/include/list.h \
- /home/d3phys/Code/list/include/log.h \
- /home/d3phys/Code/list/include/config.h
+listdev.o: listdev.cpp /home/d3phys/Code/hash-table/list/include/list.h

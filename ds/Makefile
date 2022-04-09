@@ -15,6 +15,4 @@ ds.o: $(OBJS) subdirs
 include $(TOPDIR)/Rules.makefile
 
 ### Dependencies ###
-list.o: list.cpp /home/d3phys/Code/list/include/log.h \
- /home/d3phys/Code/list/include/config.h \
- /home/d3phys/Code/list/include/list.h
+list.o: list.cpp /home/d3phys/Code/hash-table/list/include/list.h

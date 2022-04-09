@@ -59,43 +59,39 @@ CXXFLAGS = -g --static-pie -std=c++14 -fmax-errors=100 -Wall -Wextra  	   \
 	   -fsanitize=vptr                                                 \
 	   -lm -pie                                          
 
-ifdef CONFIG_LIST_DEV
-CXXFLAGS += -D DEBUG
-endif
-
-ifdef CONFIG_LOG_FILE_DEV
-CXXFLAGS += -D LOG_FILE 
-endif
+CXXFLAGS += -DDEBUG
 
 SUBDIRS = ds tests dev
 
 CXX = g++
 CPP = $(CXX) -E 
+LOGS = logs.html
 
 TOPDIR	:= $(shell if [ "$$PWD" != "" ]; then echo $$PWD; else pwd; fi)
 
 #
 # Header files
 #
-HPATH  = $(TOPDIR)/include
+HPATH  = $(TOPDIR)/include $(TOPDIR)/logs
 
 DEBUG := false 
 
-make: subdirs
-	$(OBJS)
-
-llist: subdirs ds/main.o
-	$(CXX) $(CXXFLAGS) -o list ds/main.o ds/ds.o
+make: 
+	cd ds && $(MAKE)
+	$(LD) -r -o list.o ds/ds.o
 
 test: subdirs
+	@mkdir -p log
 	cd tests && $(MAKE)
-	$(CXX) $(CXXFLAGS) -o test tests/test.o ds/ds.o dev/dev.o
+	cd logs  && $(MAKE)
+	$(CXX) $(CXXFLAGS) -o test logs/logs.o tests/test.o ds/ds.o dev/dev.o
 	./test
+
 
 touch:
 	@find $(HPATH) -print -exec touch {} \;
 
-.EXPORT_ALL_VARIABLES: CXX CXXFLAGS CPP DEBUG
+.EXPORT_ALL_VARIABLES: CXX CXXFLAGS CPP DEBUG LOGS
 
 include $(TOPDIR)/Rules.makefile
 

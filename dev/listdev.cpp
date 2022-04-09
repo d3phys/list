@@ -1,6 +1,6 @@
-#include <list.h>
 #include <assert.h>
-#include <log.h>
+#include <list.h>
+#include <logs.h>
 
 ptrdiff_t verify_list(list *const lst)
 {
@@ -65,11 +65,11 @@ ptrdiff_t verify_list(list *const lst)
         }
 
 
-        log("<font color=\"green\">verification passed</font>\n");
+        fprintf(logs,"<font color=\"green\">verification passed</font>\n");
         return 0;
 
 verify_error:
-        log("<font color=\"red\">DAMAGED NODE:  %ld</font>\n", it);
+        fprintf(logs,"<font color=\"red\">DAMAGED NODE:  %ld</font>\n", it);
 $       (dump_list(lst);)
         destruct_list(lst);
         exit(1);
@@ -143,7 +143,7 @@ void dump_list(const list *const lst)
         snprintf(buf, sizeof(buf), "dot -Tsvg log/dump%u.dot -o log/dump%u.svg", dump_num, dump_num);
         system(buf);
 
-        log("\n<img src=\"log/dump%u.svg\"/>\n", dump_num);
+        fprintf(logs,"\n<img src=\"log/dump%u.svg\"/>\n", dump_num);
 
         dump_num++;
 }
