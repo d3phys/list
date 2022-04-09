@@ -77,8 +77,9 @@ HPATH  = $(TOPDIR)/include $(TOPDIR)/logs
 DEBUG := false 
 
 make: 
-	cd ds && $(MAKE)
-	$(LD) -r -o list.o ds/ds.o
+	cd ds  && $(MAKE)
+	cd dev && $(MAKE)
+	$(LD) -r -o list.o ds/ds.o dev/dev.o
 
 test: subdirs
 	@mkdir -p log
