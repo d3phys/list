@@ -3,10 +3,11 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+#include <errno.h>
 
 #include <logs.h>
 #include <list.h>
-
+#include <entry.h>
 
 static node *realloc_list(list *const lst, const size_t new_cap);
 static inline int validate_position(list *const lst, ptrdiff_t pos);
@@ -19,6 +20,17 @@ static ptrdiff_t list_insert(
  * Oooh my... Is it TXLib style?
  */
 #define verify_list(lst) $(verify_list(lst))
+
+ptrdiff_t list_find(list *const lst, item_t item)
+{
+        assert(lst);
+         
+        ptrdiff_t cur = lst->head;
+        while (cur && list_compare(lst->nodes[cur].data, item))
+                cur = lst->nodes[cur].next;      
+
+        return cur;
+}
 
 /*
  * Exchanges the contents of the container with those of other.
@@ -103,7 +115,7 @@ ptrdiff_t make_linear_list(list *const lst)
         nodes[0] = {
                 .next = 0,
                 .prev = 0,
-                .data = 0,
+                .data = INIT_DATA,
         };
 
         nodes[lst->capacity - 1].next = 0;
@@ -166,7 +178,7 @@ $       (node *nodes = realloc_list(lst, cap + 1);)
         lst->nodes[0] = { 
                 .next = 0,
                 .prev = 0,
-                .data = 0, 
+                .data = INIT_DATA, 
         };
 
         verify_list(lst);

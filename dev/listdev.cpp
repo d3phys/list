@@ -125,8 +125,9 @@ void dump_list(const list *const lst)
                                "       fontsize= 20; \n", i, i);
 
 
-               fprintf(file, "       %lu [shape=record, label=\"<p>prev: %ld | data: %lg | <n>next: %ld\"] \n} \n",
-                       i, lst->nodes[i].prev, lst->nodes[i].data, lst->nodes[i].next);
+                fprintf(file, "       %lu [shape=record, label=\"<p>prev: %ld | ", i, lst->nodes[i].prev); 
+                list_print_item(file, lst->nodes[i].data); 
+                fprintf(file, " | <n>next: %ld\"] \n} \n", lst->nodes[i].next);
 
                 if (lst->nodes[i].prev != FREE_PREV)
                         fprintf(file, "%lu:n -> %ld:n[color=darkgoldenrod2, style=dashed]\n", i, lst->nodes[i].next);

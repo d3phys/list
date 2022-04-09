@@ -2,17 +2,17 @@
 #define LIST_H
 
 #include <stddef.h>
+#include <entry.h>
 #include <logs.h>
 
-typedef double item_t;
-
-const item_t    FREE_DATA =  1337; 
+extern const item_t FREE_DATA; 
 const ptrdiff_t FREE_PREV = -1; 
 
 struct node {
         ptrdiff_t next = -1;        
-        ptrdiff_t prev = -1;        
-        item_t    data =  0;        
+        ptrdiff_t prev = -1;
+                
+        item_t    data = INIT_DATA;        
 };
 
 struct list {
@@ -45,6 +45,10 @@ ptrdiff_t list_insert_before(list *const lst, ptrdiff_t index, item_t item);
 
 ptrdiff_t list_insert_back (list *const lst, item_t item);
 ptrdiff_t list_insert_front(list *const lst, item_t item);
+
+ptrdiff_t list_find(list *const lst, item_t item);
+
+void list_print_item(FILE *file, item_t item);
 
 #ifdef DEBUG 
 ptrdiff_t verify_list(list *const lst);

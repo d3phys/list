@@ -16,7 +16,7 @@ include CONFIG
 # Awesome flags collection
 # Copyright (C) 2021, 2022 ded32, the TXLib creator
 #
-CXXFLAGS = -g --static-pie -std=c++14 -fmax-errors=100 -Wall -Wextra  	   \
+test: CXXFLAGS = -g --static-pie -std=c++14 -fmax-errors=100 -Wall -Wextra  	   \
 	   -Weffc++ -Waggressive-loop-optimizations -Wc++0x-compat 	   \
 	   -Wc++11-compat -Wc++14-compat -Wcast-align -Wcast-qual 	   \
 	   -Wchar-subscripts -Wconditionally-supported -Wconversion        \
@@ -59,35 +59,35 @@ CXXFLAGS = -g --static-pie -std=c++14 -fmax-errors=100 -Wall -Wextra  	   \
 	   -fsanitize=vptr                                                 \
 	   -lm -pie                                          
 
-CXXFLAGS += -DDEBUG -DLOGS_MEMORY
+test: CXXFLAGS += -DDEBUG -DLOGS_MEMORY
 
 SUBDIRS = ds tests dev
 
-CXX = g++
-CPP = $(CXX) -E 
-LOGS = logs.html
+test: CXX = g++
+test: CPP = $(CXX) -E 
+test: LOGS = logs.html
 
 TOPDIR	:= $(shell if [ "$$PWD" != "" ]; then echo $$PWD; else pwd; fi)
 
 #
 # Header files
 #
-HPATH  = $(TOPDIR)/include $(TOPDIR)/logs
+test: HPATH  = $(TOPDIR)/include $(TOPDIR)/logs
 
 DEBUG := false 
 
 make: 
 	cd ds  && $(MAKE)
 	cd dev && $(MAKE)
-	$(LD) -r -o list.o ds/ds.o dev/dev.o
+	$(LD) -r -o list.o dev/dev.o ds/ds.o
 
+test: HPATH += $(TOPDIR)/dev 
 test: subdirs
 	@mkdir -p log
 	cd tests && $(MAKE)
 	cd logs  && $(MAKE)
 	$(CXX) $(CXXFLAGS) -o test logs/logs.o tests/test.o ds/ds.o dev/dev.o
 	./test
-
 
 touch:
 	@find $(HPATH) -print -exec touch {} \;
