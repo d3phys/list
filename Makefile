@@ -59,7 +59,7 @@ CXXFLAGS = -g --static-pie -std=c++14 -fmax-errors=100 -Wall -Wextra  	   \
 	   -fsanitize=vptr                                                 \
 	   -lm -pie                                          
 
-CXXFLAGS += -DDEBUG
+CXXFLAGS += -DDEBUG -DLOGS_MEMORY
 
 SUBDIRS = ds tests dev
 
