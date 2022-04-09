@@ -78,8 +78,8 @@ DEBUG := false
 
 make: 
 	cd ds  && $(MAKE)
-	cd dev && $(MAKE)
-	$(LD) -r -o list.o dev/dev.o ds/ds.o
+	#cd dev && $(MAKE)
+	$(LD) -r -o list.o ds/ds.o
 
 test: HPATH += $(TOPDIR)/dev 
 test: subdirs
