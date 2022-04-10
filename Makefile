@@ -7,16 +7,44 @@
 # 2021, d3phys
 #
 
-#
-# Configuration 
-#
-include CONFIG
+
+TOPDIR := $(shell if [ "$$PWD" != "" ]; then echo $$PWD; else pwd; fi)
+
+SUBDIRS = ds tests
+
+# Header files #
+HPATH  = $(TOPDIR)/include \
+	 $(TOPDIR)/logs
+	 
+CXX = g++
+CXXFLAGS = -I/$(TOPDIR)/dev -I/$(TOPDIR)/ent $(LOGS_FLAGS) $(TXFLAGS) -D DEBUG
+
+LOGS_FILE  = logs.html
+LOGS_FLAGS = -D LOGS_COLORS -D LOGS_FILE='"$(LOGS_FILE)"'
+
+make: list.o
+
+list.o: ds.o
+	$(LD) -r -o list.o ds/ds.o
+
+test: ds.o logs.o tests.o ent.o dev.o
+	$(CXX) $(CXXFLAGS) -o test logs/logs.o tests/tests.o ds/ds.o dev/dev.o ent/ent.o
+	./test
+
+%.o:
+	cd $(patsubst %.o,%, $@) && $(MAKE) -e
+
+touch:
+	@find $(HPATH) -print -exec touch {} \;
+
+.EXPORT_ALL_VARIABLES: LD CXX CXXFLAGS CPP LOGS
+include $(TOPDIR)/Rules.makefile
 
 #
 # Awesome flags collection
 # Copyright (C) 2021, 2022 ded32, the TXLib creator
 #
-test: CXXFLAGS = -g --static-pie -std=c++14 -fmax-errors=100 -Wall -Wextra  	   \
+TXFLAGS =  -g --static-pie -std=c++14 -fmax-errors=100 -Wall -Wextra  	   \
 	   -Weffc++ -Waggressive-loop-optimizations -Wc++0x-compat 	   \
 	   -Wc++11-compat -Wc++14-compat -Wcast-align -Wcast-qual 	   \
 	   -Wchar-subscripts -Wconditionally-supported -Wconversion        \
@@ -58,42 +86,5 @@ test: CXXFLAGS = -g --static-pie -std=c++14 -fmax-errors=100 -Wall -Wextra  	   
 	   -fsanitize=vla-bound                                            \
 	   -fsanitize=vptr                                                 \
 	   -lm -pie                                          
-
-test: CXXFLAGS += -DDEBUG -DLOGS_MEMORY
-
-SUBDIRS = ds tests dev
-
-test: CXX = g++
-test: CPP = $(CXX) -E 
-test: LOGS = logs.html
-
-TOPDIR	:= $(shell if [ "$$PWD" != "" ]; then echo $$PWD; else pwd; fi)
-
-#
-# Header files
-#
-test: HPATH  = $(TOPDIR)/include $(TOPDIR)/logs
-
-DEBUG := false 
-
-make: 
-	cd ds  && $(MAKE)
-	#cd dev && $(MAKE)
-	$(LD) -r -o list.o ds/ds.o
-
-test: HPATH += $(TOPDIR)/dev 
-test: subdirs
-	@mkdir -p log
-	cd tests && $(MAKE)
-	cd logs  && $(MAKE)
-	$(CXX) $(CXXFLAGS) -o test logs/logs.o tests/test.o ds/ds.o dev/dev.o
-	./test
-
-touch:
-	@find $(HPATH) -print -exec touch {} \;
-
-.EXPORT_ALL_VARIABLES: CXX CXXFLAGS CPP DEBUG LOGS
-
-include $(TOPDIR)/Rules.makefile
 
 ### Dependencies ###
