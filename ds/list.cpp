@@ -7,7 +7,6 @@
 
 #include <logs.h>
 #include <list.h>
-#include <entry.h>
 
 static node *realloc_list(list *const lst, const size_t new_cap);
 static inline int validate_position(list *const lst, ptrdiff_t pos);

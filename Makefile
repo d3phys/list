@@ -7,32 +7,34 @@
 # 2021, d3phys
 #
 
-
 TOPDIR := $(shell if [ "$$PWD" != "" ]; then echo $$PWD; else pwd; fi)
 
-SUBDIRS = ds tests
+
+ifeq ($(MAKELEVEL),0)
+CXX      = g++
+CXXFLAGS = -I/$(TOPDIR)/dev -I/$(TOPDIR)/dt  $(LOGS_FLAGS) $(TXFLAGS) -D DEBUG
+
+LOGS_FILE  = logs.html
+LOGS_FLAGS = -D LOGS_COLORS -D LOGS_FILE='"$(LOGS_FILE)"'
+endif
+
 
 # Header files #
 HPATH  = $(TOPDIR)/include \
 	 $(TOPDIR)/logs
-	 
-CXX = g++
-CXXFLAGS = -I/$(TOPDIR)/dev -I/$(TOPDIR)/ent $(LOGS_FLAGS) $(TXFLAGS) -D DEBUG
 
-LOGS_FILE  = logs.html
-LOGS_FLAGS = -D LOGS_COLORS -D LOGS_FILE='"$(LOGS_FILE)"'
-
-make: list.o
+SUBDIRS = ds tests dev logs dt
 
 list.o: ds.o
 	$(LD) -r -o list.o ds/ds.o
 
-test: ds.o logs.o tests.o ent.o dev.o
-	$(CXX) $(CXXFLAGS) -o test logs/logs.o tests/tests.o ds/ds.o dev/dev.o ent/ent.o
+test: ds.o logs.o tests.o dt.o dev.o
+	@mkdir -p log
+	$(CXX) $(CXXFLAGS) -o test logs/logs.o tests/tests.o ds/ds.o dev/dev.o dt/dt.o
 	./test
 
 %.o:
-	cd $(patsubst %.o,%, $@) && $(MAKE) -e
+	cd $(patsubst %.o,%, $@) && $(MAKE)
 
 touch:
 	@find $(HPATH) -print -exec touch {} \;

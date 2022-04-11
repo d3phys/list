@@ -8,12 +8,12 @@
 #
 
 
-OBJS = entry.o
+OBJS = listtype.o
 
 #
 # I'll fix this 'dummy' style... Later...
 #
-ent.o: $(OBJS) subdirs
+dt.o: $(OBJS) subdirs
 	@touch dummy.cpp
 	$(LD) -r -o $@ $(OBJS) dummy.cpp
 	@rm dummy.cpp

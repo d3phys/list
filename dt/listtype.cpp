@@ -1,4 +1,3 @@
-#include <entry.h>
 #include <list.h>
 
 int list_compare(item_t itm1, item_t itm2)

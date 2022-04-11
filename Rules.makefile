@@ -3,22 +3,21 @@
 # 2021, d3phys
 #
 
-#
-# Special variables which should not be exported
-#
+
+# Special variables which should not be exported #
 unexport SUBDIRS
 unexport OBJS
 
 clean:
+	@rm -f -R log
 	@rm -f *.o 
 	@for i in $(SUBDIRS); do (cd $$i && $(MAKE) clean); done
 
 subdirs:
 	@for i in $(SUBDIRS); do (cd $$i && echo $$i && $(MAKE)) || exit; done
 
-#
-# Dependencies 
-#
+
+# Dependencies #
 dep:
 	@sed '/\#\#\# Dependencies \#\#\#/q' < Makefile > temp_make
 	@if [[ "$(wildcard *.cpp)" != "" ]]; then $(CPP) -MM *.cpp -I$(HPATH) >> temp_make; fi
@@ -26,9 +25,8 @@ dep:
 	@rm temp_make
 	@for i in $(SUBDIRS); do (cd $$i && $(MAKE) dep) || exit; done
 
-#
-# Common rules
-#
+
+# Common rules #
 %.o : %.cpp
 	$(CXX) $(addprefix -I,$(HPATH)) $(CXXFLAGS) -c $< -o $@
 

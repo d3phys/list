@@ -2,7 +2,7 @@
 #define LIST_H
 
 #include <stddef.h>
-#include <entry.h>
+#include <listtype.h>
 #include <logs.h>
 
 extern const item_t FREE_DATA; 

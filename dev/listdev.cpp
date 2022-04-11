@@ -83,6 +83,7 @@ void dump_list(const list *const lst)
         static unsigned dump_num = 0;
 
         static char buf[512] = {0};
+        system("mkdir -p log");
         snprintf(buf, sizeof(buf), "log/dump%u.dot", dump_num);
 
         FILE *file = fopen(buf, "w");
