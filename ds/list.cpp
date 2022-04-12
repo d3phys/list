@@ -11,25 +11,15 @@
 static node *realloc_list(list *const lst, const size_t new_cap);
 static inline int validate_position(list *const lst, ptrdiff_t pos);
 
+
 static ptrdiff_t list_insert(
-        list *const lst, item_t data, ptrdiff_t next, ptrdiff_t prev
+        list *const lst, item_t *data, ptrdiff_t next, ptrdiff_t prev
 );
 
 /*
  * Oooh my... Is it TXLib style?
  */
 #define verify_list(lst) $(verify_list(lst))
-
-ptrdiff_t list_find(list *const lst, item_t item)
-{
-        assert(lst);
-         
-        ptrdiff_t cur = lst->head;
-        while (cur && list_compare(lst->nodes[cur].data, item))
-                cur = lst->nodes[cur].next;      
-
-        return cur;
-}
 
 /*
  * Exchanges the contents of the container with those of other.
@@ -43,7 +33,7 @@ void swap_list(list *const lst1, list *const lst2)
 
         list temp  = *lst2;
         *lst1      = *lst2;
-        *lst2      = temp;
+        *lst2      =  temp;
 }
 
 /*
@@ -112,9 +102,9 @@ ptrdiff_t make_linear_list(list *const lst)
                 nodes[wr].next = wr + 1;
 
         nodes[0] = {
+                .data = INIT_DATA,
                 .next = 0,
                 .prev = 0,
-                .data = INIT_DATA,
         };
 
         nodes[lst->capacity - 1].next = 0;
@@ -128,7 +118,7 @@ ptrdiff_t make_linear_list(list *const lst)
 }
 
 static ptrdiff_t list_insert(
-        list *const lst, item_t data, ptrdiff_t next, ptrdiff_t prev
+        list *const lst, item_t *data, ptrdiff_t next, ptrdiff_t prev
 ) {
         assert(lst && lst->nodes);
         verify_list(lst);
@@ -144,9 +134,9 @@ $               (node *nodes = realloc_list(lst, lst->capacity * 2);)
         lst->free = lst->nodes[free].next;
 
         lst->nodes[free] = { 
-                .next = next,
-                .prev = prev,
-                .data = data, 
+                .data = *data, 
+                .next =  next,
+                .prev =  prev,
         };
 
         if (!prev)
@@ -175,9 +165,9 @@ $       (node *nodes = realloc_list(lst, cap + 1);)
                 return nullptr;
 
         lst->nodes[0] = { 
+                .data = INIT_DATA, 
                 .next = 0,
                 .prev = 0,
-                .data = INIT_DATA, 
         };
 
         verify_list(lst);
@@ -227,7 +217,7 @@ ptrdiff_t list_delete(list *const lst, ptrdiff_t pos)
         return pos;
 }
 
-ptrdiff_t list_insert_after(list *const lst, ptrdiff_t pos, item_t data)
+ptrdiff_t list_insert_after(list *const lst, ptrdiff_t pos, item_t *data)
 {
         assert(lst && lst->nodes);
         if (validate_position(lst, pos))
@@ -247,7 +237,7 @@ ptrdiff_t list_insert_after(list *const lst, ptrdiff_t pos, item_t data)
         return ins;
 }
 
-ptrdiff_t list_insert_before(list *const lst, ptrdiff_t pos, item_t data)
+ptrdiff_t list_insert_before(list *const lst, ptrdiff_t pos, item_t *data)
 {
         assert(lst && lst->nodes);
         if (validate_position(lst, pos))
@@ -267,7 +257,7 @@ ptrdiff_t list_insert_before(list *const lst, ptrdiff_t pos, item_t data)
         return ins;
 }
 
-ptrdiff_t list_insert_front(list *const lst, item_t data)
+ptrdiff_t list_insert_front(list *const lst, item_t *data)
 {
         assert(lst && lst->nodes);
         verify_list(lst);
@@ -275,7 +265,7 @@ ptrdiff_t list_insert_front(list *const lst, item_t data)
         return list_insert_before(lst, lst->head, data);
 }
 
-ptrdiff_t list_insert_back(list *const lst, item_t data)
+ptrdiff_t list_insert_back(list *const lst, item_t *data)
 {
         assert(lst && lst->nodes);
         verify_list(lst);
@@ -304,9 +294,9 @@ $       (node *const nodes = (node *)realloc(lst->nodes, cap);)
 
         for (size_t n = lst->capacity; n < new_cap; n++)
                 nodes[n] = { 
+                        .data = FREE_DATA, 
                         .next = n + 1,
                         .prev = FREE_PREV,
-                        .data = FREE_DATA, 
                 };
 
         nodes[new_cap - 1].next = lst->free; 

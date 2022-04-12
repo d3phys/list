@@ -8,11 +8,11 @@
 extern const item_t FREE_DATA; 
 const ptrdiff_t FREE_PREV = -1; 
 
-struct node {
-        ptrdiff_t next = -1;        
+struct alignas(32) node {
+        item_t data = INIT_DATA;        
+
+        ptrdiff_t next = -1;   
         ptrdiff_t prev = -1;
-                
-        item_t    data = INIT_DATA;        
 };
 
 struct list {
@@ -40,15 +40,13 @@ ptrdiff_t make_linear_list(list *const lst);
 
 ptrdiff_t list_delete(list *const lst, ptrdiff_t index);
 
-ptrdiff_t list_insert_after (list *const lst, ptrdiff_t index, item_t item);
-ptrdiff_t list_insert_before(list *const lst, ptrdiff_t index, item_t item);
+ptrdiff_t list_insert_after (list *const lst, ptrdiff_t index, item_t *item);
+ptrdiff_t list_insert_before(list *const lst, ptrdiff_t index, item_t *item);
 
-ptrdiff_t list_insert_back (list *const lst, item_t item);
-ptrdiff_t list_insert_front(list *const lst, item_t item);
+ptrdiff_t list_insert_back (list *const lst, item_t *item);
+ptrdiff_t list_insert_front(list *const lst, item_t *item);
 
-ptrdiff_t list_find(list *const lst, item_t item);
-
-void list_print_item(FILE *file, item_t item);
+void list_print_item(FILE *file, item_t *item);
 
 #ifdef DEBUG 
 ptrdiff_t verify_list(list *const lst);
