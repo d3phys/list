@@ -15,7 +15,7 @@ struct alignas(32) node {
         ptrdiff_t prev = -1;
 };
 
-struct list {
+struct alignas(32) list {
         node *nodes = nullptr;
 
         size_t capacity = 0;

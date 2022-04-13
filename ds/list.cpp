@@ -132,7 +132,6 @@ $               (node *nodes = realloc_list(lst, lst->capacity * 2);)
         ptrdiff_t free = lst->free;
 
         lst->free = lst->nodes[free].next;
-
         lst->nodes[free] = { 
                 .data = *data, 
                 .next =  next,
@@ -141,7 +140,6 @@ $               (node *nodes = realloc_list(lst, lst->capacity * 2);)
 
         if (!prev)
                 lst->head = free;
-
         if (!next)
                 lst->tail = free;
 
@@ -267,9 +265,9 @@ ptrdiff_t list_insert_front(list *const lst, item_t *data)
 
 ptrdiff_t list_insert_back(list *const lst, item_t *data)
 {
+$$
         assert(lst && lst->nodes);
         verify_list(lst);
-
         return list_insert_after(lst, lst->tail, data);
 }
 
@@ -287,10 +285,12 @@ static node *realloc_list(list *const lst, const size_t new_cap)
         assert(new_cap > lst->capacity);
 
         size_t cap = new_cap * sizeof(node);
-
-$       (node *const nodes = (node *)realloc(lst->nodes, cap);)
+        node *nodes = (node *)aligned_alloc(32, cap);
         if (!nodes)
                 return nullptr;
+
+        if (lst->nodes)
+                memcpy(nodes, lst->nodes, lst->capacity * sizeof(node));
 
         for (size_t n = lst->capacity; n < new_cap; n++)
                 nodes[n] = { 
@@ -303,8 +303,11 @@ $       (node *const nodes = (node *)realloc(lst->nodes, cap);)
 
 $       (lst->free = lst->capacity;)
 
-        lst->capacity = new_cap;
+        if (lst->nodes)
+                free(lst->nodes);
+                
         lst->nodes    = nodes;
+        lst->capacity = new_cap;
 
         return nodes;
 }
